@@ -7,6 +7,11 @@ import { GameRoom } from './GameRoom.js';
 const app = express();
 app.use(cors());
 
+// Keep-alive endpoint for Render
+app.get('/ping', (req, res) => {
+  res.send('pong');
+});
+
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
