@@ -1,4 +1,4 @@
-import { createDeck, shuffleDeck, dealCards } from '../src/utils/deck.js';
+import { createDeck, shuffleDeck, dealCards } from './utils/deck.js';
 
 const jitterTime = (base) => base + (Math.floor(Math.random() * 70) - 35); 
 
