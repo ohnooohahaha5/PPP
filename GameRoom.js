@@ -174,7 +174,6 @@ export class GameRoom {
     this.currentPlayerIndex = 0;
     this.matchState = { active: false, eligiblePlayerId: null, status: 'idle', message: '', grabbedById: null };
     this.grabLock = false;
-    this.playLock = false;
     this.nextPlayerUnlockTime = 0;
     this.quitMessage = null;
     this.toastMessage = null;
@@ -185,7 +184,7 @@ export class GameRoom {
   }
 
   scheduleCPU() {
-    if (this.status !== 'playing' || this.playLock) return;
+    if (this.status !== 'playing') return;
 
     const totalCardsLeft = this.players.reduce((acc, p) => acc + p.cards.length, 0);
     if (totalCardsLeft === 0) {
@@ -214,7 +213,7 @@ export class GameRoom {
   }
 
   attemptPlayCard(playerId) {
-    if (this.status !== 'playing' || this.playLock) return;
+    if (this.status !== 'playing') return;
     
     const currPlayer = this.players[this.currentPlayerIndex];
     if (currPlayer.id !== playerId || currPlayer.cards.length === 0) return;
@@ -226,16 +225,12 @@ export class GameRoom {
       this.grabLock = true; 
     }
 
-    this.playLock = true;
-    this.broadcast(); // Send lock status instantly to dim play button
-    
-    const delay = jitterTime(Math.floor(Math.random() * (300 - 150 + 1)) + 150);
-    this.addTimer(() => this.revealCard(playerId), delay);
+    this.revealCard(playerId);
   }
 
   revealCard(playerId) {
     const currPlayer = this.players[this.currentPlayerIndex];
-    if (!currPlayer) { this.playLock = false; return; }
+    if (!currPlayer) return;
 
     const cardToPlay = currPlayer.cards.pop(); // Pop from end
 
@@ -254,7 +249,6 @@ export class GameRoom {
     };
 
     this.centerPile.push(playedCard);
-    this.playLock = false;
 
     let isMatch = false;
     if (this.centerPile.length > 1) {
